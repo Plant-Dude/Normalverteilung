@@ -1,3 +1,8 @@
+import json
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
 # Funktion zur Generierung von Einheiten pro Ortsteil
 def generate_unit(ortsteil, data):
     """
