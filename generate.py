@@ -63,3 +63,37 @@ def save_test_data(filename="testdaten.json"):
 if __name__ == "__main__":
     save_test_data()
 
+### Generate units, tits code from the other project but prbly needed in order for things to get smoothly
+
+def generate_unit(ortsteil, data):
+    # Ortsteil-Daten aus JSON extrahieren
+    district_data = next((d for d in data if d ["ortsteil"] == ortsteil), None)
+    if not district_data:
+        raise ValueError(f"Nöp, data {ortsteil} not found.")
+
+    district = district_data["district"]
+    value_cat = district_data["value_cat"]
+    sm_base_price = district_data["sm_base_price"]
+
+    # Größe basierend auf Gaußscher Normalverteilung
+    mean_size = 20 + value_cat * (180 - 20) # Scheitelpunkunkt basiernend auf value_cat
+    std_dev_size = 20 # Standardabweichung für ralistische Verteilung
+    size = max(20, min(int(np.random.normal(mean_size, std_dev_size)), 180)) # Begrenzung auf [20, 180]
+
+    # Zustand basierend auf value_cat
+    condition_min = max(0.1, value_cat - 0.2)
+    condition_max = min(1.0, value_cat + 0.2)
+    condition = np.random.uniform(condition_min, condition_max)
+
+    # Extras basierend auf value_cat
+    extras_probability = round(0.05 + value_cat * 0.15, 2)
+    extras = 1 if random.random() < extras_probability else 0
+
+    # Wert berechnen (nach Tests vielleicht auch über Normalverteilung
+    value = calculate_value(size, condition,extras, sm_base_price)
+
+    # Einheit erstellen
+    name = generate_unit_name()
+    return RealEstateUnit(name, district, value, size, condition, extras, rent=None, tenant=None)
+
+
